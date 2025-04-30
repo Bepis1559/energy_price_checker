@@ -4,8 +4,6 @@ export async function getPrice() {
     const data = await response.json();
     const quarterHourArray = data[1];
     const index = getCurrentIndex();
-    console.log("index : " + index);
-    console.log(quarterHourArray);
     const foundData = quarterHourArray[index];
     const price = foundData ? foundData.price : null;
     return price;
