@@ -4,7 +4,7 @@ import cors from "cors";
 const app = express();
 app.use(cors());
 const PORT = process.env.PORT ?? 5000;
-const FETCH_INTERVAL = 180000;
+const FETCH_INTERVAL = 60000;
 let latestPrice = null;
 // Update the price immediately and every 5 minutes
 async function updatePrice() {
