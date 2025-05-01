@@ -1,25 +1,20 @@
 import express from "express";
-import { handleFetching } from "./helpers/handleFetching.js";
 import cors from "cors";
+import { fetchPricesForCurrentDay } from "./helpers/fetchPricesForCurrentDay.js";
+import { getTimedPrices } from "./helpers/getTimedPrices.js";
+import { getCurrentHourInBulgaria } from "./helpers/getCurrentHourInBulgaria.js";
+import { shouldSystemActivate } from "./helpers/shouldSystemActivate.js";
 const app = express();
 app.use(cors());
 const PORT = process.env.PORT ?? 5000;
-const FETCH_INTERVAL = 60000;
-let latestPrice = null;
-// Update the price immediately and every 5 minutes
-async function updatePrice() {
-    latestPrice = await handleFetching();
-}
-await updatePrice();
-setInterval(updatePrice, FETCH_INTERVAL);
 // Define API endpoint
-app.get("/price", (req, res) => {
-    if (latestPrice !== null) {
-        res.json({ price: latestPrice });
-    }
-    else {
-        res.status(503).json({ error: "Price not ready yet" });
-    }
+app.get("/shouldActivate", async (req, res) => {
+    const prices = await fetchPricesForCurrentDay();
+    const timedPrices = getTimedPrices(prices);
+    const currentHour = getCurrentHourInBulgaria();
+    const shouldActivate = shouldSystemActivate(timedPrices, currentHour);
+    console.log(shouldActivate);
+    res.status(200).json({ shouldActivate });
 });
 app.listen(PORT, () => {
     console.log(`⚡ Server is running on port ${PORT}`);
